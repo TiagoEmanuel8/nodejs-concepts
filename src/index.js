@@ -52,9 +52,17 @@ app.post('/todos', checkUser, (request, response) => {
   return response.status(201).json(todo)
 });
 
-// app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
-// });
+app.put('/todos/:id', checkUser, (request, response) => {
+  const { user } = request;
+  const { title, deadline } = request.body;
+  const { id } = request.params;
+
+  const todo = user.todo.find(el => el.id === id);
+  todo.title = title;
+  todo.deadline = new Date(deadline);
+
+  return response.status(200).json(todo);
+});
 
 // app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
   // Complete aqui
