@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const request = require('supertest');
 const { validate } = require('uuid');
 
@@ -38,6 +39,6 @@ describe('Users', () => {
       })
       .expect(400);
 
-    expect(response.body.error).toBeTruthy();
+    expect(response.body.error).toBe();
   });
 });
