@@ -14,28 +14,37 @@ const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.body;
+
   const checkUsername = users.find(el => el.username === username);
   if (checkUsername) return response.status(400).json({ message: "user already registered" });
+
   req.checkUsername = username;
+
   next();
 }
 
 function checkUser(request, response, next) {
   const { username } = request.headers;
+
   const user = users.find(el => el.username === username);
   if (!user) return response.status(400).json({ message: "user not found" });
+
   request.user = user;
+
   return next();
 }
 
 app.post('/users', checksExistsUserAccount, (request, response) => {
   const { name, username } = request.body;
+
   users.push({ id: uuidv4(), name, username, todos: []});
+
   return response.status(201).json(users[0]);
 });
 
 app.get('/todos', checkUser, (request, response) => {
   const { user } = request;
+
   return response.status(200).json(user.todos)
 });
 
@@ -56,20 +65,36 @@ app.put('/todos/:id', checkUser, (request, response) => {
   const { user } = request;
   const { title, deadline } = request.body;
   const { id } = request.params;
-
-  const todo = user.todo.find(el => el.id === id);
+  console.log(user.todos)
+  const todo = user.todos.find(el => el.id === id);
   todo.title = title;
   todo.deadline = new Date(deadline);
 
   return response.status(200).json(todo);
 });
 
-// app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
-// });
+app.patch('/todos/:id/done', checkUser, (request, response) => {
+  const { user } = request;
+  const { done } = request.body;
+  const { id } = request.params;
 
-// app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
-// });
+  const todo = user.todos.find(el => el.id === id);
+  todo.done = done;
+
+  return response.status(200).json(todo);
+});
+
+app.delete('/todos/:id', checkUser, (request, response) => {
+  const { user } = request;
+  const { id } = request.params;
+
+  const searchToDo = user.todos.findIndex(el => el.id === id);
+  if (todoIndex === -1) {
+    return response.status(404).json({ error: 'To do not found' });
+  }
+  user.todos.splice(searchToDo, 1);
+
+  return response.status(204).end();
+});
 
 module.exports = app;
