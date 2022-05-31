@@ -27,7 +27,7 @@ function checkUser(request, response, next) {
   const { username } = request.headers;
 
   const user = users.find(el => el.username === username);
-  if (!user) return response.status(400).json({ message: "user not found" });
+  if (!user) return response.status(404).json({ message: "user not found" });
 
   request.user = user;
 
@@ -65,7 +65,6 @@ app.put('/todos/:id', checkUser, (request, response) => {
   const { user } = request;
   const { title, deadline } = request.body;
   const { id } = request.params;
-  console.log(user.todos)
   const todo = user.todos.find(el => el.id === id);
   todo.title = title;
   todo.deadline = new Date(deadline);
@@ -89,7 +88,7 @@ app.delete('/todos/:id', checkUser, (request, response) => {
   const { id } = request.params;
 
   const searchToDo = user.todos.findIndex(el => el.id === id);
-  if (todoIndex === -1) {
+  if (searchToDo === -1) {
     return response.status(404).json({ error: 'To do not found' });
   }
   user.todos.splice(searchToDo, 1);
